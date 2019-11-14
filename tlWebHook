@@ -1,0 +1,59 @@
+<?php
+$bottoken = " ... ";
+$chat_id = " ... "; // Пример: -333801755. Знак - указывает что это чат группы
+$reply = 'Новый заказ';
+//$update = json_decode(file_get_contents('php://input'), JSON_OBJECT_AS_ARRAY);
+$data = json_decode(file_get_contents('php://input'));
+file_put_contents(__DIR__ .'/log.txt', file_get_contents('php://input')); // записываем всё что пришло из телеграмм в файл
+
+$mess= $data->{'message'}->{'text'};
+$messButton= $data->{'callback_query'}->{'data'};
+
+switch ($messButton) {
+    case 'button_0':
+        $reply = 'Нажата кнопка: '.$messButton;
+        break;
+    case 'button_1':
+        $reply = 'Нажата кнопка: '.$messButton;
+        break;
+    case 'button_2':
+        $reply = 'Нажата кнопка: '.$messButton;
+        break;
+}
+
+    $url = 'https://api.telegram.org/bot' . $bottoken . '/sendMessage';
+    $keyboard = array(
+        "inline_keyboard" => array(
+            array(array(
+                "text" => "Кнопка 0",
+                "callback_data" => "button_0",
+                ),
+                array(
+                    "text" => "Кнопка 1",
+                    "callback_data" => "button_1",
+                )
+            ),
+            array(array(
+                "text" => "Кнопка 2",
+                "callback_data" => "button_2",
+            ))
+        )
+    ); 
+    $postfields = array(
+    'chat_id' => "$chat_id",
+    'text' => $reply,
+    'reply_markup' => json_encode($keyboard)
+    );
+
+if (!$curld = curl_init()) {
+exit;
+}
+
+curl_setopt($curld, CURLOPT_POST, true);
+curl_setopt($curld, CURLOPT_POSTFIELDS, $postfields);
+curl_setopt($curld, CURLOPT_URL,$url);
+curl_setopt($curld, CURLOPT_RETURNTRANSFER, true);
+
+$output = curl_exec($curld);
+
+curl_close ($curld);
